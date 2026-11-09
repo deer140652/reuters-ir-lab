@@ -1,0 +1,127 @@
+{
+ "categories": {
+  "sem": {
+   "label": "語意相近",
+   "desc": "同義、同類或詞形變化"
+  },
+  "ctx": {
+   "label": "常一起出現",
+   "desc": "搭配詞、同一事件的人物機構、反義詞"
+  },
+  "odd": {
+   "label": "意外的鄰居",
+   "desc": "公司名稱、股票代號、低頻詞"
+  }
+ },
+ "note": "訓練集 9,603 篇；維度 100、視窗 5、負樣本 5、5 epochs。",
+ "words": {
+  "oil": {
+   "cbow": {
+    "natural": "ctx",
+    "petroleum": "sem",
+    "crude": "sem",
+    "energy": "sem",
+    "fuel": "sem"
+   },
+   "sg": {
+    "crude": "sem",
+    "gas": "ctx",
+    "petroleum": "sem",
+    "pipeline": "ctx",
+    "natural": "ctx"
+   },
+   "brief": "petroleum、crude、fuel 是合理的同類詞；natural、gas 來自「oil and natural gas」這個固定搭配。",
+   "topic": "crude"
+  },
+  "petroleum": {
+   "cbow": {
+    "cooper": "odd",
+    "amoco": "ctx",
+    "columbia": "odd",
+    "sun": "odd",
+    "mobil": "ctx"
+   },
+   "sg": {
+    "gas": "ctx",
+    "dmp": "odd",
+    "cooper": "odd",
+    "xon": "odd",
+    "refining": "ctx"
+   },
+   "brief": "鄰居幾乎都是公司名稱或代號（Amoco、Mobil、Sun、DMP = Dome Petroleum、XON = Exxon）：路透社裡的 petroleum 大多出現在公司名稱中。oil 的鄰居有 petroleum，petroleum 的鄰居卻沒有 oil。",
+   "topic": "crude（對照）"
+  },
+  "wheat": {
+   "cbow": {
+    "corn": "sem",
+    "soybeans": "sem",
+    "barley": "sem",
+    "feedgrains": "sem",
+    "durum": "sem"
+   },
+   "sg": {
+    "corn": "sem",
+    "ussr": "ctx",
+    "soybeans": "sem",
+    "grains": "sem",
+    "barley": "sem"
+   },
+   "brief": "CBOW 的鄰居全是農作物（corn、barley、durum…）；Skip-Gram 多了 USSR，因為蘇聯是 1987 年美國小麥的主要買家。",
+   "topic": "grain"
+  },
+  "profit": {
+   "cbow": {
+    "profits": "sem",
+    "pre-tax": "ctx",
+    "loss": "ctx",
+    "turnover": "ctx",
+    "income": "sem"
+   },
+   "sg": {
+    "loss": "ctx",
+    "pre-tax": "ctx",
+    "oper": "ctx",
+    "profits": "sem",
+    "swissair": "odd"
+   },
+   "brief": "Skip-Gram 中最接近 profit 的詞是意思相反的 loss（0.79）：財報的句型固定（net profit X vs loss Y），兩個詞的上下文幾乎一樣。",
+   "topic": "earn"
+  },
+  "deficit": {
+   "cbow": {
+    "surplus": "ctx",
+    "deficits": "sem",
+    "narrowed": "ctx",
+    "widened": "ctx",
+    "shortfall": "sem"
+   },
+   "sg": {
+    "surplus": "ctx",
+    "narrowed": "ctx",
+    "deficits": "sem",
+    "narrows": "ctx",
+    "visible": "ctx"
+   },
+   "brief": "最接近的詞是反義詞 surplus（0.89）。順差與逆差出現在完全相同的句子裡：trade surplus/deficit narrowed/widened to X billion。",
+   "topic": "trade"
+  },
+  "takeover": {
+   "cbow": {
+    "hostile": "ctx",
+    "unsolicited": "ctx",
+    "dart": "odd",
+    "cyacq": "odd",
+    "sgl": "odd"
+   },
+   "sg": {
+    "hostile": "ctx",
+    "unsolicited": "ctx",
+    "icahn": "ctx",
+    "cyacq": "odd",
+    "gencorp": "odd"
+   },
+   "brief": "hostile、unsolicited 是惡意收購的固定搭配；Dart、Cyacq、GenCorp 來自 1987 年被大量報導的幾件收購案，一件大新聞就能改變一個詞的鄰居。",
+   "topic": "acq"
+  }
+ }
+}

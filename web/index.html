@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reuters-21578 新聞檢索實驗</title>
+<meta name="description" content="以 1987 年路透社新聞（ModApte 切分）比較 TF-IDF 與 TF-IDF 加權詞向量（CBOW／Skip-Gram）的檢索效能。">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="loading" class="loading-banner">載入新聞與詞向量模型中…</div>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-top">
+      <span>Reuters-21578 · 1987 年路透社新聞</span>
+      <a href="https://github.com/deer140652/reuters-ir-lab" target="_blank" rel="noopener">原始碼（GitHub）↗</a>
+    </div>
+    <h1>Reuters-21578 新聞檢索實驗</h1>
+    <p class="subtitle">以 1987 年路透社新聞（ModApte 切分）比較 TF-IDF 與 TF-IDF 加權詞向量（CBOW／Skip-Gram）的檢索效能。</p>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="頁面區塊">
+  <div class="section-nav-inner">
+    <a href="#overview">實驗設計</a>
+    <a href="#search">檢索系統</a>
+    <a href="#w2v">語意鄰近</a>
+    <a href="#eval">效能評估</a>
+    <a href="#topic">敏感度測試</a>
+    <a href="#conclusion">討論</a>
+  </div>
+</nav>
+
+<!-- ================================================================== -->
+<section class="lab-section" id="overview">
+  <div class="wrap">
+    <h2><span class="sec-no">01</span>資料集與實驗設計</h2>
+    <p class="lead">Reuters-21578 依 <strong>ModApte</strong> 切分：詞向量只用訓練集學習，檢索在另外的測試集上進行。新聞屬於哪些主題由 <code>topics</code> 欄位標示，用來判斷一篇新聞是否相關。</p>
+    <div class="stat-grid" id="ov-stats"></div>
+    <p class="small muted" id="ov-topics" style="margin-top:10px"></p>
+    <div class="zblock">
+      <h3>文件表示方法</h3>
+      <div class="formula">A　TF-IDF
+   w(t,d) = (1 + ln tf) × ln(N / df)
+   分數 = cos(q, d)
+
+B　TF-IDF 加權詞向量
+   d = Σ w(t,d) · v̂_t　　（v̂_t：單位長度的詞向量）
+   q = Σ w(t,q) · v̂_t
+   分數 = cos(q, d)</div>
+      <p class="hint">B 保留 TF-IDF 對「重要的詞」的判斷，再用詞向量帶入詞的上下文。兩者使用同一套前處理：轉小寫、去標點與數字、去停用詞，不做詞幹還原。</p>
+      <p class="small muted" id="w2v-train-line"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="lab-section alt" id="search">
+  <div class="wrap">
+    <h2><span class="sec-no">02</span>檢索系統與分數拆解</h2>
+    <p class="lead">同一個查詢，在三種方法下的排序結果。詞向量方法能檢索出完全沒有出現查詢詞的新聞；右側將所選新聞的分數拆解為各詞對的貢獻。</p>
+    <form id="search-form" class="search-form" role="search">
+      <input id="search-input" type="text" aria-label="搜尋新聞" placeholder="輸入英文查詢，例如 petroleum supply" autocomplete="off">
+      <button type="submit">搜尋</button>
+    </form>
+    <div class="controls">
+      <div class="seg" id="search-method" role="group" aria-label="檢索方法">
+        <button type="button" data-m="tfidf">A：TF-IDF</button>
+        <button type="button" data-m="cbow">B：CBOW</button>
+        <button type="button" data-m="sg" class="on">B：Skip-Gram</button>
+      </div>
+      <div class="chips" id="search-chips" style="margin:0"></div>
+    </div>
+    <p class="result-count" id="result-count"></p>
+    <div class="search-layout">
+      <div id="results"></div>
+      <aside class="panel" id="panel">
+        <div class="zblock" style="margin-top:0">
+          <h3>分數拆解：查詢詞 × 文件詞的貢獻矩陣</h3>
+          <p class="small" id="panel-doc"></p>
+          <div class="chart" id="calc-heat"></div>
+          <p class="small muted" id="calc-heat-meta"></p>
+          <div class="finding navy" id="calc-finding"></div>
+          <details class="more">
+            <summary>計算細節：TF-IDF 與文件向量</summary>
+            <div class="table-wrap" id="calc-tfidf" style="margin-top:8px"></div>
+            <div class="formula" id="calc-tfidf-sum"></div>
+            <p class="small" style="margin:12px 0 4px"><strong>文件向量的組成</strong>（權重最高的詞；灰色 = 沒有詞向量）</p>
+            <div class="chart" id="calc-docvec"></div>
+            <p class="small muted" id="calc-docvec-meta"></p>
+          </details>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="lab-section" id="w2v">
+  <div class="wrap">
+    <h2><span class="sec-no">03</span>詞向量的語意鄰近分析</h2>
+    <p class="lead">詞向量依上下文的相似程度排列詞彙。在路透社語料中，最近鄰多半反映新聞情境的共現關係，例如固定搭配、同一事件的人物與公司，甚至是反義詞，而不一定是同義詞。這些鄰近關係是否真的影響排序，見第 04、05 節。</p>
+    <div class="zblock">
+      <h3>代表詞的 Top-5 最近鄰</h3>
+      <p class="hint">各主題選取一個核心詞，另以 petroleum 作為 oil 的同義詞對照。詞下方標示所屬主題與在訓練集的出現次數。</p>
+      <div class="legend" id="nb-legend"></div>
+      <div class="table-wrap" id="nb-table"></div>
+    </div>
+    <div class="grid2">
+      <div class="zblock">
+        <h3>詞對餘弦相似度：同類、反義與無關詞對</h3>
+        <p class="hint">反義詞對的相似度與同類詞對相當，只有無關詞對接近 0：向量相近代表上下文相似，不代表語意相同。</p>
+        <div class="legend"><span><span class="sw" style="background:var(--m-cbow)"></span>CBOW</span><span><span class="sw" style="background:var(--m-sg)"></span>Skip-Gram</span></div>
+        <div class="chart" id="pair-chart"></div>
+      </div>
+      <div class="zblock">
+        <h3>詞向量降維視覺化：PCA 與 t-SNE</h3>
+        <div class="controls">
+          <label>詞（逗號分隔，各帶 5 個鄰居）<input type="text" id="viz-words" value="oil, wheat, profit, merger, deficit" style="min-width:240px"></label>
+          <label>模型<select id="viz-model"><option value="sg">Skip-Gram</option><option value="cbow">CBOW</option></select></label>
+          <div class="seg" id="viz-mode"><button type="button" data-v="tsne" class="on">t-SNE</button><button type="button" data-v="pca">PCA</button></div>
+          <button type="button" id="viz-go" class="ghost">重畫</button>
+        </div>
+        <div class="legend" id="viz-legend"></div>
+        <div class="chart" id="viz-chart"></div>
+        <p class="small muted" id="viz-meta"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="lab-section alt" id="eval">
+  <div class="wrap">
+    <h2><span class="sec-no">04</span>檢索效能評估：TF-IDF 與 TF-IDF 加權詞向量</h2>
+    <p class="lead">測試集包含 25 個查詢，涵蓋 earn（財報）、acq（併購）、crude（原油）、grain（穀物）、trade（貿易）五個主題；其中 10 個「換字查詢」刻意避開新聞最常見的用字（例如以 petroleum 代替 oil），用以檢驗詞彙不匹配時兩種方法的差異。</p>
+    <div class="zblock">
+      <h3>整體檢索指標（P@10、MRR、nDCG@10）</h3>
+      <div class="table-wrap" id="eval-main"></div>
+      <div class="finding" id="eval-finding"></div>
+    </div>
+    <div class="grid2">
+      <div class="zblock">
+        <h3>逐查詢 nDCG@10 差異（Skip-Gram − TF-IDF）</h3>
+        <div class="legend"><span><span class="sw" style="background:var(--m-sg)"></span>Skip-Gram 較好</span><span><span class="sw" style="background:var(--m-tfidf)"></span>TF-IDF 較好</span><span>★ 換字查詢</span></div>
+        <div class="chart" id="wl-chart"></div>
+      </div>
+      <div class="zblock">
+        <h3>無詞彙重疊的檢索結果</h3>
+        <p class="hint">Skip-Gram 前 10 名中與查詢沒有任何共同字、TF-IDF 無法檢索到的新聞：</p>
+        <div class="stat-grid" id="zo-stats"></div>
+        <h3 style="margin-top:22px">誤判案例分析</h3>
+        <p class="hint">誤判的新聞多半不是完全無關，而是相鄰主題或字面相同、意思不同。</p>
+        <div id="fail-cases"></div>
+      </div>
+    </div>
+    <div class="zblock">
+      <h3>架構與參數敏感度：CBOW 與 Skip-Gram</h3>
+      <p class="hint">以相同的 25 個查詢，比較不同視窗大小與向量維度下兩種架構的檢索效果（nDCG@10）。</p>
+      <div class="table-wrap" id="param-table"></div>
+      <div class="finding navy" id="param-finding"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="lab-section" id="topic">
+  <div class="wrap">
+    <h2><span class="sec-no">05</span>語意敏感度測試：反義查詢與詞彙遮蔽</h2>
+    <p class="lead">兩項實驗從相反方向檢驗排序對查詢用字的敏感度。反義查詢：比較意思相反的兩個查詢，前 10 名結果的重疊篇數。詞彙遮蔽：將查詢詞從全部新聞中刪除後重新排序，觀察檢索效果的變化。</p>
+    <div class="grid2">
+      <div class="zblock">
+        <h3>反義查詢的結果重疊率</h3>
+        <div class="legend" id="ant-legend"></div>
+        <div class="chart" id="ant-chart"></div>
+        <p class="small" id="ant-finding"></p>
+      </div>
+      <div class="zblock">
+        <h3>詞彙遮蔽下的檢索穩健性</h3>
+        <div class="controls">
+          <div class="seg" id="mask-mode"><button type="button" data-v="key" class="on">刪掉最關鍵的一個詞</button><button type="button" data-v="all">刪掉所有查詢詞</button></div>
+        </div>
+        <div class="legend"><span><span class="sw" style="background:#C9C4B5"></span>刪除前</span><span><span class="sw" style="background:var(--navy)"></span>刪除後</span><span>虛線：隨機排序</span></div>
+        <div class="chart" id="mask-chart"></div>
+        <p class="small" id="mask-finding"></p>
+      </div>
+    </div>
+    <div class="finding navy" id="topic-finding"></div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="lab-section alt" id="conclusion">
+  <div class="wrap">
+    <h2><span class="sec-no">06</span>綜合討論與研究限制</h2>
+    <div class="zblock" id="concl-body"></div>
+  </div>
+</section>
+
+<footer class="foot">
+  資料：Reuters-21578, Distribution 1.0（ModApte split），僅供研究使用。所有計算在瀏覽器中即時執行。
+</footer>
+
+<div class="modal-back" id="modal-back">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="close" id="modal-close" aria-label="關閉">×</button>
+    <h3 id="modal-title"></h3>
+    <div id="modal-meta" class="small muted"></div>
+    <pre id="modal-body"></pre>
+  </div>
+</div>
+<div class="chart-tip" id="chart-tip"></div>
+
+<script src="assets/js/ir-core.js"></script>
+<script src="assets/js/eval-core.js"></script>
+<script src="assets/js/word2vec.js"></script>
+<script src="assets/js/embed-core.js"></script>
+<script src="assets/js/experiments.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

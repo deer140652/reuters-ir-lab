@@ -1,0 +1,282 @@
+{
+ "description": "5 個主題 × 5 個查詢。相關性以 Reuters topics 欄位判斷（新聞含有該主題即相關）。keyword：使用該主題最常見的字；paraphrase：避開最常見的主題字，改用同義或相關的說法。",
+ "queries": [
+  {
+   "id": "E1",
+   "topic": "earn",
+   "type": "keyword",
+   "text": "quarterly net profit",
+   "note": "財報最常見的字：net、profit"
+  },
+  {
+   "id": "E2",
+   "topic": "earn",
+   "type": "keyword",
+   "text": "earnings per share",
+   "note": "每股盈餘"
+  },
+  {
+   "id": "E3",
+   "topic": "earn",
+   "type": "keyword",
+   "text": "dividend declared",
+   "note": "宣告股利"
+  },
+  {
+   "id": "E4",
+   "topic": "earn",
+   "type": "paraphrase",
+   "text": "company income results",
+   "note": "避開 net、profit、shr"
+  },
+  {
+   "id": "E5",
+   "topic": "earn",
+   "type": "paraphrase",
+   "text": "shareholder payout raised",
+   "note": "payout 代替 dividend"
+  },
+  {
+   "id": "A1",
+   "topic": "acq",
+   "type": "keyword",
+   "text": "merger agreement",
+   "note": "合併協議"
+  },
+  {
+   "id": "A2",
+   "topic": "acq",
+   "type": "keyword",
+   "text": "acquisition of company stake",
+   "note": "收購持股"
+  },
+  {
+   "id": "A3",
+   "topic": "acq",
+   "type": "keyword",
+   "text": "takeover bid",
+   "note": "收購出價"
+  },
+  {
+   "id": "A4",
+   "topic": "acq",
+   "type": "paraphrase",
+   "text": "buyout offer",
+   "note": "避開 acquire、acquisition、merger"
+  },
+  {
+   "id": "A5",
+   "topic": "acq",
+   "type": "paraphrase",
+   "text": "purchase of subsidiary",
+   "note": "purchase 代替 acquire"
+  },
+  {
+   "id": "C1",
+   "topic": "crude",
+   "type": "keyword",
+   "text": "crude oil prices",
+   "note": "原油價格"
+  },
+  {
+   "id": "C2",
+   "topic": "crude",
+   "type": "keyword",
+   "text": "opec oil production",
+   "note": "OPEC 產量"
+  },
+  {
+   "id": "C3",
+   "topic": "crude",
+   "type": "keyword",
+   "text": "oil output barrels per day",
+   "note": "每日桶數"
+  },
+  {
+   "id": "C4",
+   "topic": "crude",
+   "type": "paraphrase",
+   "text": "petroleum supply",
+   "note": "petroleum 代替 oil"
+  },
+  {
+   "id": "C5",
+   "topic": "crude",
+   "type": "paraphrase",
+   "text": "energy fuel exporters",
+   "note": "避開 oil、crude"
+  },
+  {
+   "id": "G1",
+   "topic": "grain",
+   "type": "keyword",
+   "text": "wheat exports",
+   "note": "小麥出口"
+  },
+  {
+   "id": "G2",
+   "topic": "grain",
+   "type": "keyword",
+   "text": "grain shipments",
+   "note": "穀物運送"
+  },
+  {
+   "id": "G3",
+   "topic": "grain",
+   "type": "keyword",
+   "text": "corn and soybean crop",
+   "note": "玉米與黃豆"
+  },
+  {
+   "id": "G4",
+   "topic": "grain",
+   "type": "paraphrase",
+   "text": "cereal harvest",
+   "note": "cereal 代替 grain、wheat"
+  },
+  {
+   "id": "G5",
+   "topic": "grain",
+   "type": "paraphrase",
+   "text": "farm produce sales to soviet union",
+   "note": "避開 grain、wheat、corn"
+  },
+  {
+   "id": "T1",
+   "topic": "trade",
+   "type": "keyword",
+   "text": "trade deficit",
+   "note": "貿易逆差"
+  },
+  {
+   "id": "T2",
+   "topic": "trade",
+   "type": "keyword",
+   "text": "tariffs on imports",
+   "note": "進口關稅"
+  },
+  {
+   "id": "T3",
+   "topic": "trade",
+   "type": "keyword",
+   "text": "trade surplus with japan",
+   "note": "對日貿易順差"
+  },
+  {
+   "id": "T4",
+   "topic": "trade",
+   "type": "paraphrase",
+   "text": "protectionist retaliation",
+   "note": "避開 trade、tariffs"
+  },
+  {
+   "id": "T5",
+   "topic": "trade",
+   "type": "paraphrase",
+   "text": "sanctions against japanese semiconductors",
+   "note": "1987 年美日半導體爭端，避開 trade"
+  }
+ ],
+ "antonymPairs": [
+  {
+   "id": "P1",
+   "a": "trade surplus",
+   "b": "trade deficit",
+   "note": "順差 vs 逆差（共用 trade）"
+  },
+  {
+   "id": "P2",
+   "a": "surplus",
+   "b": "deficit",
+   "note": "單字反義"
+  },
+  {
+   "id": "P3",
+   "a": "profit",
+   "b": "loss",
+   "note": "財報的盈與虧"
+  },
+  {
+   "id": "P4",
+   "a": "exports",
+   "b": "imports",
+   "note": "出口 vs 進口"
+  },
+  {
+   "id": "P5",
+   "a": "prices rise",
+   "b": "prices fall",
+   "note": "上漲 vs 下跌（共用 prices）"
+  },
+  {
+   "id": "P6",
+   "a": "buy stake",
+   "b": "sell stake",
+   "note": "買進 vs 賣出持股（共用 stake）"
+  },
+  {
+   "id": "P7",
+   "a": "dividend raised",
+   "b": "dividend cut",
+   "note": "調高 vs 調降股利（共用 dividend）"
+  }
+ ],
+ "neighborWords": [
+  "oil",
+  "petroleum",
+  "wheat",
+  "profit",
+  "deficit",
+  "takeover"
+ ],
+ "wordPairs": [
+  [
+   "oil",
+   "petroleum"
+  ],
+  [
+   "oil",
+   "crude"
+  ],
+  [
+   "wheat",
+   "corn"
+  ],
+  [
+   "merger",
+   "acquisition"
+  ],
+  [
+   "takeover",
+   "buyout"
+  ],
+  [
+   "profit",
+   "loss"
+  ],
+  [
+   "surplus",
+   "deficit"
+  ],
+  [
+   "exports",
+   "imports"
+  ],
+  [
+   "buy",
+   "sell"
+  ],
+  [
+   "rise",
+   "fall"
+  ],
+  [
+   "oil",
+   "dividend"
+  ],
+  [
+   "wheat",
+   "merger"
+  ]
+ ]
+}
